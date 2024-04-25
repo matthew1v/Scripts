@@ -1,8 +1,3 @@
--- Gui to Lua
--- Version: 3.2
-
--- Instances:
-
 local ScreenGuiDSP = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
 local Title = Instance.new("TextLabel")
@@ -684,9 +679,7 @@ Border.Text = ""
 Border.TextColor3 = Color3.fromRGB(0, 0, 0)
 Border.TextSize = 14.000
 
--- Scripts:
-
-local function FFYO_fake_script() -- ScreenGuiDSP.LocalScript 
+local function FFYO_fake_script()
 	local script = Instance.new('LocalScript', ScreenGuiDSP)
 
 	local Players = game:GetService("Players")
