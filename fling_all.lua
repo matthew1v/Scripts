@@ -56,14 +56,16 @@ for i = 1, 100 do
 	if aliveCheck(LocalPlayer) then
 		local target = getNonFlungPlayers()[math.random(1, #getNonFlungPlayers())]
 		if target ~= nil then
+			local index = 0
 			repeat
 				if aliveCheck(LocalPlayer) then
 					LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(target.Character:GetPivot().p - Vector3.new(0, 1, 0) + (target.Character.PrimaryPart.Velocity / 8.5), Vector3.new(
 						math.random(-9999, 9999), math.random(-9999, 9999), math.random(-9999, 9999)
 					))
 				end
+				index = index + 1
 				task.wait()
-			until not aliveCheck(target)
+			until not aliveCheck(target) or index > 255
 		end
 	end
 	task.wait()
