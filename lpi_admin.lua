@@ -50,30 +50,32 @@ end
 local commands = {}
 
 function getPlayer(name)
-	local plrs = {}
+    local plrs = {}
 
-	if name == "me" then
-		table.insert(plrs, lplr)
-		return plrs
-	end
+    if name == "me" then
+        table.insert(plrs, lplr)
+        return plrs
+    elseif name == "all" then
+        return game.Players:GetPlayers()
+    elseif name == "others" then
+        for _, v in ipairs(game.Players:GetPlayers()) do
+            if v ~= lplr then
+                table.insert(plrs, v)
+            end
+        end
+        return plrs
+    else
+        -- Look for players whose username matches or contains the provided name
+        local lowerName = name:lower()
+        for _, v in ipairs(game.Players:GetPlayers()) do
+            if v.Name:lower():match(lowerName) then
+                table.insert(plrs, v)
+            end
+        end
+        return plrs
+    end
 
-	for i, v in next, game:GetService("Players"):GetPlayers() do
-		if name == "all" then
-			table.insert(plrs, v)
-			continue
-		elseif name == "others" then
-			if v ~= lplr then
-				table.insert(plrs, v)
-			end
-			continue
-		end
-
-		if name:lower():find(v.Name:lower()) or v.Name:lower():format(name:lower()) then
-			table.insert(plrs, v)
-		end
-	end
-
-	return plrs
+    return plrs
 end
 
 function importCommand(command, aliases, func)
