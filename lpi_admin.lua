@@ -321,3 +321,17 @@ lplr.Chatted:Connect(function(message, rec)
 		say("Could not find this command!")
 	end
 end)
+
+local xd = false
+game:GetService("RunService").RenderStepped:Connect(function()
+	if xd then return end
+	if (getItem("F3X") or getItem("Building Tools")) then return nil end
+	xd = true
+	local last = lplr.Character:GetPivot()
+	repeat task.wait(0.5)
+		lplr.Character:PivotTo(workspace.GearBoardManagerModel.LoadOut.SlotDisplayButton:GetPivot())
+		fireclickdetector(workspace.GearBoardManagerModel.LoadOut.SlotDisplayButton:FindFirstChildOfClass("ClickDetector"))
+	until (getItem("F3X") or getItem("Building Tools"))
+	lplr.Character:PivotTo(last)
+	xd = false
+end)
