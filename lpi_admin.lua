@@ -36,13 +36,8 @@ do
 			error("Failed to delete object, because F3X was not found!")
 			return nil
 		end
-		
-		local old = self.instance.Parent
-		self.instance.Parent = lplr.Character
+
 		invokeRemote(self.instance:FindFirstChildOfClass("BindableFunction"):FindFirstChildOfClass("RemoteFunction"), "UndoRemove", {instance})
-		task.delay(0.3, function()
-			self.instance.Parent = old
-		end)
 	end
 end
 
@@ -50,12 +45,12 @@ local commands = {}
 
 function getPlayer(name)
 	local plrs = {}
-	
+
 	if name == "me" then
 		table.insert(plrs, lplr)
 		return plrs
 	end
-	
+
 	for i, v in next, game:GetService("Players"):GetPlayers() do
 		if name == "all" then
 			table.insert(plrs, v)
@@ -66,12 +61,12 @@ function getPlayer(name)
 			end
 			continue
 		end
-		
+
 		if name:lower():find(v.Name:lower()) or v.Name:lower():format(name:lower()) then
 			table.insert(plrs, v)
 		end
 	end
-	
+
 	return plrs
 end
 
@@ -83,6 +78,10 @@ function importCommand(command, aliases, func)
 end
 local admins = {}
 local adminconnections = {}
+
+function say(msg)
+	game.StarterGui:SetCore( "ChatMakeSystemMessage",  { Text = "[Vex Admin] " .. msg, Color = Color3.fromRGB(255, 255, 255), Font = Enum.Font.Ubuntu, FontSize = Enum.FontSize.Size24 } )
+end
 
 function chatted(message, rec)
 	message = message:lower()
@@ -116,7 +115,8 @@ importCommand("commands", {"cmds"}, function(players)
 		"admin [all? | others? | username] [aliases: rank]" ..
 		"\n" .. "unadmin [all? | others? | username] [aliases: unrank, demote]" ..
 		"\n" .. "kill [all? | others? | username] [aliases: respawn]" ..
-		"\n" .. "removetools [all? | others? | username] [aliases: notools, remtools, rtools]"
+		"\n" .. "removetools [all? | others? | username] [aliases: notools, remtools, rtools]" ..
+		"\n" .. "permnotools [all? | others? | username] [aliases: premtools, prtools]"
 	)
 end)
 
@@ -127,6 +127,7 @@ importCommand("admin", {"rank"}, function(players)
 		if not table.find(admins, v) then
 			table.insert(admins, v)
 			adminconnections[v.UserId] = v.Chatted:Connect(chatted)
+			say("Gave admin to " .. v.Name .. "!")
 		end
 	end
 end)
@@ -138,6 +139,7 @@ importCommand("unadmin", {"unrank", "demote"}, function(players)
 			table.remove(admins, table.find(admins, v))
 			adminconnections[v.UserId]:Disconnect()
 			adminconnections[v.UserId] = nil
+			say("Removed admin from " .. v.Name .. "!")
 		end
 	end
 end)
@@ -150,6 +152,7 @@ importCommand("kill", {"respawn"}, function(players)
 		if v.Character ~= nil then
 			F3X:Destroy(v.Character:FindFirstChild("Torso"):FindFirstChild("Neck"))
 			F3X:Destroy(v.Character:FindFirstChild("Head"))
+			say("Killed " .. v.Name .. "!")
 		end
 	end
 end)
@@ -181,7 +184,48 @@ importCommand("removetools", {"notools", "remtools", "rtools"}, function(players
 				F3X:Destroy(vv)
 			end
 		end
+		say("Removed all tools for " .. v.Name .. "!")
 	end
+end)
+
+local notools = false
+function permnotoolsplayer(player)
+	local v = player
+	if v == lplr then return end
+	if table.find(admins, v) then return end
+	player.Character.ChildAdded:Connect(function(item)
+		local F3X = BuildingToolsExploiter.new()
+		if item:IsA("Tool") then
+			if notools then
+				if v == lplr or table.find(admins, v) then return nil end
+				F3X:Destroy(item)
+			end
+		end
+	end)
+	player.CharacterAdded:Connect(function(character)
+		character.ChildAdded:Connect(function(item)
+			local F3X = BuildingToolsExploiter.new()
+			if item:IsA("Tool") then
+				if notools then
+					if v == lplr or table.find(admins, v) then return nil end
+					F3X:Destroy(item)
+				end
+			end
+		end)
+	end)
+end
+
+for i, v in next, game:GetService("Players"):GetPlayers() do
+	permnotoolsplayer(v)
+end
+
+game.Players.PlayerAdded:Connect(function(v)
+	permnotoolsplayer(v)
+end)
+
+importCommand("permnotools", {"premtools", "prtools"}, function(players)
+	notools = not notools
+	say("No Tools is now toggled! [set: " .. (notools and "enabled" or "disabled") .. "]")
 end)
 
 lplr.Chatted:Connect(function(message, rec)
@@ -201,7 +245,7 @@ lplr.Chatted:Connect(function(message, rec)
 					break
 				end
 			end
-			
+
 			if foundalias then
 				return pcall(function()
 					commandcontents.func(player)
