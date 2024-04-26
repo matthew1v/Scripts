@@ -37,7 +37,13 @@ do
 			return nil
 		end
 
-		invokeRemote(self.instance:FindFirstChildOfClass("BindableFunction"):FindFirstChildOfClass("RemoteFunction"), "UndoRemove", {instance})
+		task.spawn(function()
+			local old = self.instance.Parent
+			self.instance.Parent = lplr.Character
+			invokeRemote(self.instance:FindFirstChildOfClass("BindableFunction"):FindFirstChildOfClass("RemoteFunction"), "UndoRemove", {instance})
+			task.wait(1)
+			self.instance.Parent = old
+		end)
 	end
 end
 
@@ -82,6 +88,8 @@ local adminconnections = {}
 function say(msg)
 	game.StarterGui:SetCore( "ChatMakeSystemMessage",  { Text = "[Vex Admin] " .. msg, Color = Color3.fromRGB(255, 255, 255), Font = Enum.Font.Ubuntu, FontSize = Enum.FontSize.Size24 } )
 end
+
+say("Hello! Thanks for using Vex Admin.\nTo view commands, please type:\n!cmds\nPrefixes: !, ., ?\nExamples:\n?kick username\n.ban username\n!kill others\nSuffixes for targets: others, all, everyone, me, [username?]\nCheck out the commands by typing\n!cmds\n& then pressing F9 (to close press F9 again or press the X button on top right of the console menu)")
 
 function chatted(message, rec)
 	message = message:lower()
@@ -219,13 +227,70 @@ for i, v in next, game:GetService("Players"):GetPlayers() do
 	permnotoolsplayer(v)
 end
 
+local banned = {}
+local delay2 = false
+local serverlock = false
+importCommand("serverlock", {"lockserver", "slock"}, function(players)
+	if delay2 then return nil end
+	delay2 = true
+	serverlock = not serverlock
+	say("Server lock is now toggled! [set: " .. (serverlock and "enabled" or "disabled") .. "]")
+	task.wait(1)
+	delay2 = false
+end)
 game.Players.PlayerAdded:Connect(function(v)
+	if table.find(banned, v.Name) or serverlock then
+		local F3X = BuildingToolsExploiter.new()
+		F3X:Destroy(v)
+	end
 	permnotoolsplayer(v)
 end)
 
+local delay = false
 importCommand("permnotools", {"premtools", "prtools"}, function(players)
+	if delay then return nil end
+	delay = true
 	notools = not notools
 	say("No Tools is now toggled! [set: " .. (notools and "enabled" or "disabled") .. "]")
+	task.wait(1)
+	delay = false
+end)
+
+importCommand("kick", {"disconnect", "forceleave"}, function(players)
+	for i, v in next, players do
+		task.spawn(function()
+			local F3X = BuildingToolsExploiter.new()
+			if v == lplr then return end
+			if table.find(admins, v) then return end
+			say("Kicked " .. v.Name .. "!")
+			F3X:Destroy(v)
+		end)
+	end
+end)
+
+importCommand("kick", {"disconnect", "forceleave"}, function(players)
+	for i, v in next, players do
+		task.spawn(function()
+			local F3X = BuildingToolsExploiter.new()
+			if v == lplr then return end
+			if table.find(admins, v) then return end
+			say("Kicked " .. v.Name .. "!")
+			F3X:Destroy(v)
+		end)
+	end
+end)
+
+importCommand("ban", {}, function(players)
+	for i, v in next, players do
+		task.spawn(function()
+			local F3X = BuildingToolsExploiter.new()
+			if v == lplr then return end
+			if table.find(admins, v) then return end
+			say("Banned " .. v.Name .. "!")
+			table.insert(banned, v.Name)
+			F3X:Destroy(v)
+		end)
+	end
 end)
 
 lplr.Chatted:Connect(function(message, rec)
@@ -252,5 +317,7 @@ lplr.Chatted:Connect(function(message, rec)
 				end)
 			end
 		end
+		
+		say("Could not find this command!")
 	end
 end)
