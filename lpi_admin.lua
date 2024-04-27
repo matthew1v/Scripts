@@ -272,7 +272,7 @@ end)
 
 importCommand("destroyserver", {"destroyworkspace", "destroyall"}, function(players)
 	for i, v in next, workspace:GetChildren() do
-        if v.Name == lplr name then continue end
+        if v.Name == lplr.Name then continue end
         local isAdmin = false
         for ii, vv in next, admins do
             if v.Name == vv.Name then
