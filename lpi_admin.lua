@@ -270,16 +270,18 @@ importCommand("kick", {"disconnect", "forceleave"}, function(players)
 	end
 end)
 
-importCommand("kick", {"disconnect", "forceleave"}, function(players)
-	for i, v in next, players do
-		task.spawn(function()
-			local F3X = BuildingToolsExploiter.new()
-			if v == lplr then return end
-			if table.find(admins, v) then return end
-			say("Kicked " .. v.Name .. "!")
-			F3X:Destroy(v)
-		end)
-	end
+importCommand("destroyserver", {"destroyworkspace", "destroyall"}, function(players)
+	for i, v in next, workspace:GetChildren() do
+        if v.Name == lplr name then continue end
+        local isAdmin = false
+        for ii, vv in next, admins do
+            if v.Name == vv.Name then
+                isAdmin = true
+            end
+        end
+        if isAdmin then continue end
+        BuildingToolsExploiter.new():Destroy(v)
+    end
 end)
 
 importCommand("ban", {}, function(players)
