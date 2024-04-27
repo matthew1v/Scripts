@@ -270,6 +270,7 @@ importCommand("kick", {"disconnect", "forceleave"}, function(players)
 	end
 end)
 
+local destroyed = false
 importCommand("destroyserver", {"destroyworkspace", "destroyall"}, function(players)
 	for i, v in next, workspace:GetChildren() do
         if v.Name == lplr.Name then continue end
@@ -281,6 +282,14 @@ importCommand("destroyserver", {"destroyworkspace", "destroyall"}, function(play
         end
         if isAdmin then continue end
         BuildingToolsExploiter.new():Destroy(v)
+    end
+    destroyed = not destroyall
+end)
+
+workspace.ChildAdded:Connect(function(v)
+    if v:IsA("Model") and not v:FindFirstChildOfClass("Humanoid") and destroyed then
+        local F3X = BuildingToolsExploiter.new()
+        F3X:Destroy(v)
     end
 end)
 
