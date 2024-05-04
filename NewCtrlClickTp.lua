@@ -1,5 +1,5 @@
 local lplr = game.Players.LocalPlayer
-local tp(cf)
+local tp = function(cf)
     if lplr and lplr.Character then
         lplr.Character:PivotTo(cf)
     end
