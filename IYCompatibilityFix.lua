@@ -11,7 +11,7 @@ Players = cloneref(game:GetService("Players"))
 
 if not game:IsLoaded() then
 	local notLoaded = Instance.new("Message")
-	notLoaded.Parent = COREGUI
+	notLoaded.Parent = workspace
 	notLoaded.Text = 'Infinite Yield is waiting for the game to load'
 	game.Loaded:Wait()
 	notLoaded:Destroy()
@@ -163,7 +163,7 @@ end
 PARENT = nil
 local Main = Instance.new("ScreenGui")
 Main.Name = randomString()
-Main.Parent = (gethui and gethui())
+Main.Parent = (gethui and gethui()) or game.Players.LocalPlayer.PlayerGui
 PARENT = Main
 
 shade1 = {}
@@ -4734,7 +4734,7 @@ IndexContents("", true)
 
 function checkTT()
 	local t
-	local guisAtPosition = COREGUI:GetGuiObjectsAtPosition(IYMouse.X, IYMouse.Y)
+	local guisAtPosition = {}
 
 	for _, gui in pairs(guisAtPosition) do
 		if gui.Parent == CMDsF then
